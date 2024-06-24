@@ -1,0 +1,377 @@
+﻿create database QuanLyNhaSach
+
+USE QuanLyNhaSach
+GO
+----------TẠO BẢNG LOẠI---------
+create table LOAI
+(
+	MALOAI INT IDENTITY(1,1) NOT NULL,
+	TENLOAI NVARCHAR(50) NOT NULL,
+	CONSTRAINT PK_CL PRIMARY KEY (MALOAI)
+)
+---------TẠO BẢNG KHÁCH HÀNG-------
+create table KHACHHANG
+(
+	MAKH INT IDENTITY(1,1) NOT NULL,
+	TENKH NVARCHAR(50) NOT NULL,
+	DIACHI NVARCHAR(50),
+	DIENTHOAI NVARCHAR(50),
+	CONSTRAINT PK_KH PRIMARY KEY(MAKH)
+)
+---------NHÀ XUẤT BẢN-----------
+CREATE TABLE NHAXB
+(
+	MANXB INT IDENTITY(1,1) NOT NULL,
+	TENNCC NVARCHAR(100),
+	DIACHI NVARCHAR(50),
+	DIENTHOAI NVARCHAR(50),
+	CONSTRAINT PK_NXB PRIMARY KEY(MANXB)
+)
+
+
+---------TẠO BẢNG HÀNG HÓA-------
+CREATE TABLE HANGHOA
+(
+	MAHANG INT IDENTITY(1,1) NOT NULL,
+	TENHANG NVARCHAR(50) NOT NULL,
+	SOLUONG INT,
+	DONGIANHAP FLOAT,
+	DONGIABAN FLOAT,
+	ANH NVARCHAR(200),
+	GHICHU NVARCHAR(200),
+	MALOAI INT,
+	MANXB INT,
+	CONSTRAINT PK_HH PRIMARY KEY (MAHANG),
+	CONSTRAINT FK_HH FOREIGN KEY (MALOAI) REFERENCES LOAI(MALOAI),
+	CONSTRAINT FK_HH_NXB FOREIGN KEY (MANXB) REFERENCES NHAXB(MANXB)
+)
+---------TẠO BẢNG NHÂN VIÊN-------
+CREATE TABLE NHANVIEN
+(
+	MANV INT IDENTITY(1,1) NOT NULL,
+	TENNV NVARCHAR(50) NOT NULL,
+	GIOITINH NVARCHAR(30),
+	DIACHI NVARCHAR(50),
+	DIENTHOAI NVARCHAR(50),
+	NGAYSINH DATE,
+	ANHNV NVARCHAR(200),
+	CONSTRAINT PK_NV PRIMARY KEY (MANV)
+)
+
+create table DATHANG
+(
+	MADONHANG VARCHAR(10),
+	NGAYDATHANG VARCHAR(10),
+	CONSTRAINT PK_DDH PRIMARY KEY (MADONHANG)
+)
+create table CHITIETDATHANG
+(
+	MADONHANG VARCHAR(10),
+	MAHANG INT,
+	SOLUONG int,
+	MANXB INT ,
+	CONSTRAINT PK_CTDDH PRIMARY KEY (MADONHANG, MAHANG),
+	CONSTRAINT FK_CTDDH_DDH FOREIGN KEY (MADONHANG) REFERENCES DATHANG(MADONHANG),
+	CONSTRAINT FK_CTDDH_NHAXB FOREIGN KEY (MANXB) REFERENCES NHAXB(MANXB),
+	CONSTRAINT FK_CTDDH_HANGHOA FOREIGN KEY (MAHANG) REFERENCES HANGHOA(MAHANG)
+)
+
+---------TẠO BẢNG HÓA ĐƠN---------
+CREATE TABLE HOADON
+(
+	MAHD VARCHAR(20) NOT NULL,
+	NGAYBAN DATE NOT NULL,
+	MANV INT,
+	MAKH INT,
+	TONGTIEN FLOAT,
+	CONSTRAINT PK_HD PRIMARY KEY (MAHD),
+	CONSTRAINT FK_HD_NV FOREIGN KEY (MANV) REFERENCES NHANVIEN(MANV),
+	CONSTRAINT FK_HH_KH FOREIGN KEY (MAKH) REFERENCES KHACHHANG(MAKH)
+)
+---------TẠO BẢNG CHI TIẾT HÓA ĐƠN-------
+CREATE TABLE CHITIETHOADON
+(
+	MAHD VARCHAR(20) NOT NULL,
+	MAHANG INT NOT NULL,
+	SOLUONG FLOAT,
+	DONGIA FLOAT,
+	GIAMGIA FLOAT,
+	THANHTIEN FLOAT,
+	CONSTRAINT PK_CTHD PRIMARY KEY (MAHD,MAHANG),
+	CONSTRAINT FK_CTHD_HD FOREIGN KEY (MAHD) REFERENCES HOADON(MAHD),
+	CONSTRAINT FK_CTHD_HH FOREIGN KEY (MAHANG) REFERENCES HANGHOA(MAHANG)
+	
+)
+
+-----------TẠO BẢNG TÀI KHOẢN--------
+create table TAIKHOAN
+(
+	TENTAIKHOAN VARCHAR(50),
+	EMAIL VARCHAR(50),
+	MATKHAU VARCHAR(50),
+	CONFIRMPASS VARCHAR(50), 
+	MANV INT,
+	is_admin INT,
+	CONSTRAINT PK_TK PRIMARY KEY (TENTAIKHOAN),
+	CONSTRAINT FK_CTHD_NV FOREIGN KEY (MANV) REFERENCES NHANVIEN(MANV)
+)
+----------Thêm dữ liệu vào bảng loại----------
+INSERT INTO LOAI( TENLOAI)
+VALUES(N'SÁCH'),
+	(N'TRUYỆN'),
+	(N'BÚT'),
+	(N'BALO'),
+	(N'DỤNG CỤ THỂ THAO')
+SELECT* FROM LOAI
+
+---------Thêm dữ liệu vào bảng khách hàng----------
+INSERT INTO KHACHHANG(TENKH,DIACHI,DIENTHOAI)
+VALUES(N'00', N'  ','000000000'),
+	(N'PHẠM THỊ THANH THÚY', N'CẦN THƠ','0123456789'),
+	(N'HOÀNG TRUNG KIÊN', N'TP.HCM','0121456239'),
+	(N'NGUYỄN HOÀNG PHÚC', N'SÓC TRĂNG','0775356789'),
+	(N'PHẠM THỊ THANH THỦY', N'CẦN THƠ','0123456789'),
+	(N'LÂM THÀNH ĐẠT', N'ĐỒNG NAI','0123225579'),
+	(N'HỒ MINH ANH', N'TUYÊN QUANG','0983860756')
+	SELECT* FROM KHACHHANG
+
+-------THÊM NHÀ XUẤT BẢN-----------
+INSERT INTO NHAXB(TENNCC,DIACHI, DIENTHOAI)
+VALUES(N'KIM ĐỒNG',N'HÀ NỘI','0125456984'),
+(N'NHÀ XUẤT BẢN TRẺ',N'TP. HỒ CHÍ MINH','0125456988'),
+(N'VIỆT TIẾN',N'HÀ NỘI','0125451184'),
+(N'THIÊN LONG',N'HÀ NỘI','0125456254')
+
+SELECT*FROM NHAXB
+---------Thêm dữ liệu vào bảng hàng hóa---------------
+INSERT INTO HANGHOA(TENHANG,SOLUONG, DONGIANHAP,DONGIABAN,ANH,GHICHU,MALOAI,MANXB)
+VALUES(N'TẮT ĐÈN',10,25000,30000,N'ANH1.PNG',N'HÀNG CAO CẤP', 1,1),
+	(N'VỢ CHỒNG A PHỦ',15,20900,23100,N'ANH2.PNG',N'HÀNG CAO CẤP', 1,2),
+	(N'TOÁN 12',20,25000,28500,N'ANH3.PNG',N'HÀNG THƯỜNG', 1,3),
+	(N'PHÂN TÍCH THIẾT KẾ HỆ THỐNG',12,40000,45000,N'ANH4.JPG',N'HÀNG THƯỜNG',1,4),
+	(N'TẤM CÁM',22,24900,26000,N'ANH5.PNG',N'HÀNG CAO CẤP', 2,1),
+	(N'DOREMON',18,15000,18000,N'ANH6.PNG',N'HÀNG CAO CẤP', 2,2),
+	(N'POKEMON',20,18000,19000,N'ANH7.PNG',N'HÀNG CAO CẤP', 2,2),
+	(N'Truyện kiều',14,3500,5000,N'ANH8.PNG',N'HÀNG THƯỜNG', 3,1),
+	(N'Thánh Gióng',25,6500,8000,N'ANH9.PNG',N'HÀNG CAO CẤP', 3,3),
+	(N'Balo Adidas',35,250000,270000,N'ANH10.PNG',N'HÀNG CAO CẤP',4,4),
+	(N'Alibaba.',30,160000,175000,N'ANH11.PNG',N'HÀNG CAO CẤP', 4,3),
+	(N'Tạp chí Thiếu niên',20,140900,150900,N'ANH12.PNG',N'HÀNG CAO CẤP', 5,1),
+	(N'Dế mèn phiêu lưu ký.',14,320000,340000,N'ANH13.PNG',N'HÀNG CAO CẤP', 5,2)
+		
+		SELECT*FROM HANGHOA
+
+----------Thêm dữ liệu vào bảng nhân viên ----------
+INSERT INTO NHANVIEN(TENNV,GIOITINH,DIACHI,DIENTHOAI,NGAYSINH,ANHNV)
+VALUES(N'PHẠM THỊ THÙY TRANG',N'NỮ',N'CẦN THƠ','099350644','1999-08-12',N'NV1.PNG'),
+	(N'NGUYỄN THỊ MẬN',N'NỮ',N'HẬU GIANG','0912486523','1998-03-11',N'NV2.PNG'),
+	(N'TÔ NGỌC LAN',N'NỮ',N'BÌNH ĐỊNH','0902354786','1989-10-02',N'NV3.PNG'),
+	(N'LƯƠNG MINH QUÂN',N'NAM',N'KHÁNH HÒA','0325687452','1997-02-24',N'NV4.PNG')
+SELECT*FROM NHANVIEN
+
+
+
+
+INSERT INTO TAIKHOAN(TENTAIKHOAN,EMAIL,MATKHAU,CONFIRMPASS,MANV, is_admin)
+VALUES('admin','admin123@gmail.com','admin123','admin123',1,0),
+	('man','man123@gmail.com','man123','man123',2,1),
+	('lan','lan123@gmail.com','lan123','lan123',3,1)
+	select *from TAIKHOAN
+-------------TRUY VẤN---------------
+--TÍNH THÀNH TIỀN CHI TIẾT HÓA ĐƠN
+SELECT * FROM CHITIETHOADON
+SELECT MAHD, THANHTIEN= SUM((SOLUONG*DONGIA)-((SOLUONG*DONGIA*GIAMGIA)/100))
+FROM CHITIETHOADON
+GROUP BY MAHD,THANHTIEN
+GO
+
+
+CREATE TRIGGER trg_UpdateThanhTien
+ON CHITIETHOADON
+AFTER INSERT, UPDATE
+AS
+BEGIN
+    -- Cập nhật các bản ghi bị thay đổi trong bảng CHITIETHOADON
+    UPDATE c
+    SET c.THANHTIEN = c.SOLUONG * c.DONGIA * (1 - c.GIAMGIA / 100.0)
+    FROM CHITIETHOADON c
+    JOIN inserted i ON c.MAHD = i.MAHD AND c.MAHANG = i.MAHANG
+    WHERE c.MAHD IN (SELECT MAHD FROM inserted) 
+      AND c.MAHANG IN (SELECT MAHANG FROM inserted)
+END;
+
+
+
+-- Tạo trigger để cập nhật tổng tiền của hóa đơn sau khi có sự thay đổi trong chi tiết hóa đơn
+CREATE TRIGGER trg_UpdateTongTienHoaDon
+ON CHITIETHOADON
+AFTER INSERT, UPDATE, DELETE
+AS
+BEGIN
+
+    UPDATE HOADON
+    SET TONGTIEN = (
+        SELECT SUM(THANHTIEN)
+        FROM CHITIETHOADON
+        WHERE MAHD = HOADON.MAHD
+    )
+    WHERE MAHD IN (
+        SELECT DISTINCT MAHD
+        FROM inserted
+        UNION
+        SELECT DISTINCT MAHD
+        FROM deleted
+    );
+END;
+
+
+-- -------  update số lượng hàng trong bảng hàng hóa sau khi đặt hàng từ nhà xuất bản--------------
+CREATE TRIGGER trgChiTietDatHang
+ON CHITIETDATHANG
+AFTER INSERT, UPDATE, DELETE
+AS
+BEGIN
+    -- Xử lý cho INSERT
+    IF EXISTS (SELECT * FROM Inserted) AND NOT EXISTS (SELECT * FROM Deleted)
+    BEGIN
+        UPDATE H
+        SET H.SOLUONG = H.SOLUONG + I.SOLUONG
+        FROM HANGHOA H
+        JOIN Inserted I ON H.MAHANG = I.MAHANG
+    END
+
+    -- Xử lý cho UPDATE
+    IF EXISTS (SELECT * FROM Inserted) AND EXISTS (SELECT * FROM Deleted)
+    BEGIN
+        UPDATE H
+        SET H.SOLUONG = H.SOLUONG - D.SOLUONG + I.SOLUONG
+        FROM HANGHOA H
+        JOIN Inserted I ON H.MAHANG = I.MAHANG
+        JOIN Deleted D ON H.MAHANG = D.MAHANG
+    END
+
+    -- Xử lý cho DELETE
+    IF EXISTS (SELECT * FROM Deleted) AND NOT EXISTS (SELECT * FROM Inserted)
+    BEGIN
+        UPDATE H
+        SET H.SOLUONG = H.SOLUONG - D.SOLUONG
+        FROM HANGHOA H
+        JOIN Deleted D ON H.MAHANG = D.MAHANG
+    END
+END
+
+
+
+-- ---------------------  update số lượng hàng trong bảng hàng hóa sau khi xuất hóa đơn--------------
+CREATE TRIGGER trg_UpdateSoLuongHangHoa
+ON CHITIETHOADON
+AFTER INSERT, UPDATE, DELETE
+AS
+BEGIN
+    -- Xử lý khi có INSERT
+    IF EXISTS (SELECT * FROM inserted) AND NOT EXISTS (SELECT * FROM deleted)
+    BEGIN
+        UPDATE H
+        SET H.SOLUONG = H.SOLUONG - I.SOLUONG
+        FROM HANGHOA H
+        JOIN inserted I ON H.MAHANG = I.MAHANG
+    END
+
+    -- Xử lý khi có DELETE
+    IF EXISTS (SELECT * FROM deleted) AND NOT EXISTS (SELECT * FROM inserted)
+    BEGIN
+        UPDATE H
+        SET H.SOLUONG = H.SOLUONG + D.SOLUONG
+        FROM HANGHOA H
+        JOIN deleted D ON H.MAHANG = D.MAHANG
+    END
+
+    -- Xử lý khi có UPDATE
+    IF EXISTS (SELECT * FROM inserted) AND EXISTS (SELECT * FROM deleted)
+    BEGIN
+        UPDATE H
+        SET H.SOLUONG = H.SOLUONG + D.SOLUONG - I.SOLUONG
+        FROM HANGHOA H
+        JOIN inserted I ON H.MAHANG = I.MAHANG
+        JOIN deleted D ON H.MAHANG = D.MAHANG
+    END
+END;
+
+select *from HOADON
+
+----- GIẢM GIÁ------------------
+
+CREATE TRIGGER Trigger_GiamGia
+ON HOADON
+AFTER INSERT
+AS
+BEGIN
+    DECLARE @MaKH INT
+    DECLARE @SumTongTien FLOAT
+    DECLARE @GiamGia FLOAT
+
+    -- Lấy MAKH của hóa đơn mới được chèn vào
+    SELECT @MaKH = inserted.MAKH
+    FROM inserted
+
+    -- Tính tổng tiền của các hóa đơn có MAKH tương ứng
+    SELECT @SumTongTien = SUM(TONGTIEN)
+    FROM HOADON
+    WHERE MAKH = @MaKH
+
+    -- Kiểm tra và cập nhật giảm giá trong CHITIETHOADON
+    IF @SumTongTien > 500000
+        SET @GiamGia = 10 -- Giảm 10%
+    ELSE IF @SumTongTien > 250000
+        SET @GiamGia = 5 -- Giảm 5%
+    ELSE
+        SET @GiamGia = 0 -- Không giảm
+
+    UPDATE CHITIETHOADON
+    SET GIAMGIA = @GiamGia
+    WHERE MAHD IN (
+            SELECT MAHD
+            FROM HOADON
+            WHERE MAKH = @MaKH
+            )
+END
+
+
+
+/*
+----bị nhảy giamgia sang hóa đơn cũ----
+
+CREATE TRIGGER Trigger_GiamGia
+ON HOADON
+AFTER INSERT
+AS
+BEGIN
+    DECLARE @MaHD VARCHAR(20)
+    DECLARE @MaKH INT
+    DECLARE @SumTongTien FLOAT
+    DECLARE @GiamGia FLOAT
+
+    -- Lấy thông tin hóa đơn mới được chèn vào
+    SELECT @MaHD = MAHD, @MaKH = MAKH FROM inserted
+
+    -- Tính tổng tiền của hóa đơn mới được thêm vào
+    SELECT @SumTongTien = SUM(TONGTIEN)
+    FROM HOADON
+    WHERE MAKH = @MaKH
+
+    -- Kiểm tra và cập nhật giảm giá
+    IF @SumTongTien > 500000
+        SET @GiamGia = 10 -- Giảm 10%
+    ELSE IF @SumTongTien > 250000
+        SET @GiamGia = 5 -- Giảm 5%
+    ELSE
+        SET @GiamGia = 0 -- Không giảm
+
+    -- Cập nhật giảm giá cho các chi tiết hóa đơn của hóa đơn mới được thêm vào
+    UPDATE CHITIETHOADON
+    SET GIAMGIA = @GiamGia
+    WHERE MAHD = @MaHD AND MAHD IN (SELECT MAHD FROM inserted);
+END
+*/
+--------------------------------------
+-------------------------------------
